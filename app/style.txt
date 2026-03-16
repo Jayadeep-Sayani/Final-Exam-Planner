@@ -1,0 +1,368 @@
+Create a minimalist geometric dashboard website UI.
+Use a white background, black structural borders, and orange accent color (#FF6A00).
+All shapes must have sharp corners with no border radius.
+Use a strict grid layout with evenly spaced rectangular cards.
+Typography should be bold geometric sans-serif such as Space Grotesk.
+Headings uppercase with tight letter spacing.
+Buttons are rectangular with 2px borders and orange hover states.
+Icons are simple line icons with 2px stroke width.
+No shadows, gradients, or rounded elements.
+Layout includes a navigation bar, hero section, stats cards, feature grid, activity list, and system status panels.
+
+
+
+Core Design Philosophy
+
+Minimalist, geometric, grid-based interface.
+
+No rounded edges.
+No gradients.
+No shadows.
+Only sharp rectangular shapes.
+
+White background.
+Black structure.
+Orange accent.
+
+Everything aligns to a rigid grid system.
+
+Color System
+
+Primary palette only.
+
+--color-background: #FFFFFF;
+--color-primary-text: #111111;
+--color-secondary-text: #444444;
+--color-border: #1A1A1A;
+--color-accent: #FF6A00;
+--color-accent-hover: #E65F00;
+--color-muted: #F4F4F4;
+
+
+Usage rules
+
+• Orange only for highlights
+• Numbers, CTA buttons, active nav, small indicators
+• Never large backgrounds
+
+Global Layout
+max-width: 1200px
+margin: 0 auto
+padding: 40px
+
+
+Spacing scale
+
+4px
+8px
+12px
+16px
+24px
+32px
+48px
+64px
+
+
+Grid
+
+display: grid
+grid-template-columns: repeat(12, 1fr)
+gap: 24px
+
+Border Rules
+
+Every component uses sharp borders.
+
+border: 2px solid #111111
+border-radius: 0
+
+
+Dividers
+
+border-bottom: 1px solid #111111
+
+Typography
+
+Use a geometric modern font.
+
+Good options
+
+Space Grotesk
+Sora
+Rajdhani
+Inter (if needed)
+
+
+Primary font spec
+
+font-family: "Space Grotesk", sans-serif;
+
+Heading Styles
+H1
+font-size: 48px
+font-weight: 700
+letter-spacing: 0.02em
+line-height: 1.2
+text-transform: uppercase
+color: #111111
+margin-bottom: 16px
+
+H2
+font-size: 32px
+font-weight: 700
+letter-spacing: 0.02em
+text-transform: uppercase
+margin-bottom: 12px
+
+H3
+font-size: 20px
+font-weight: 600
+letter-spacing: 0.03em
+text-transform: uppercase
+margin-bottom: 8px
+
+Paragraph Settings
+font-size: 16px
+line-height: 1.6
+font-weight: 400
+color: #444444
+max-width: 600px
+margin-bottom: 16px
+
+
+Secondary text
+
+font-size: 14px
+color: #666666
+
+List Items
+
+Used for notifications, activity logs, menus.
+
+list-style: none
+padding: 0
+margin: 0
+
+
+Each item
+
+display: flex
+align-items: center
+justify-content: space-between
+padding: 12px 16px
+border-bottom: 1px solid #111111
+font-size: 14px
+
+
+Notification indicator
+
+width: 8px
+height: 8px
+background: #FF6A00
+margin-right: 12px
+
+
+Square only.
+
+Div / Card Components
+
+All content blocks use the same system.
+
+background: #FFFFFF
+border: 2px solid #111111
+padding: 24px
+display: flex
+flex-direction: column
+gap: 12px
+
+
+Header inside card
+
+border-bottom: 1px solid #111111
+padding-bottom: 8px
+margin-bottom: 12px
+
+Stats Block
+
+Numbers are emphasized.
+
+font-size: 40px
+font-weight: 700
+color: #FF6A00
+
+
+Label
+
+font-size: 14px
+text-transform: uppercase
+letter-spacing: 0.05em
+color: #444444
+
+Button System
+
+Primary button
+
+display: inline-block
+padding: 12px 24px
+border: 2px solid #111111
+background: #FFFFFF
+color: #111111
+font-size: 14px
+font-weight: 600
+letter-spacing: 0.04em
+text-transform: uppercase
+cursor: pointer
+border-radius: 0
+transition: all 0.2s ease
+
+
+Hover
+
+background: #FF6A00
+color: #FFFFFF
+border-color: #FF6A00
+
+
+Secondary button
+
+background: #111111
+color: #FFFFFF
+border: 2px solid #111111
+
+
+Hover
+
+background: #FF6A00
+border-color: #FF6A00
+
+Links
+color: #111111
+text-decoration: none
+font-weight: 500
+position: relative
+
+
+Hover underline
+
+border-bottom: 2px solid #FF6A00
+
+Navigation Bar
+
+Height
+
+height: 72px
+
+
+Style
+
+display: flex
+align-items: center
+justify-content: space-between
+border-bottom: 2px solid #111111
+padding: 0 32px
+background: #FFFFFF
+
+
+Menu items
+
+display: flex
+gap: 32px
+font-size: 14px
+text-transform: uppercase
+letter-spacing: 0.05em
+
+
+Active link
+
+border-bottom: 3px solid #FF6A00
+padding-bottom: 4px
+
+Sidebar
+
+Width
+
+260px
+
+
+Style
+
+border-right: 2px solid #111111
+padding: 24px
+display: flex
+flex-direction: column
+gap: 12px
+
+
+Active item
+
+border-left: 4px solid #FF6A00
+padding-left: 12px
+
+Icon System
+
+Style
+
+stroke icons
+2px stroke width
+no fill
+color: #111111
+
+
+Size
+
+small: 16px
+medium: 20px
+large: 28px
+
+
+Accent icon
+
+color: #FF6A00
+
+
+Examples
+
+analytics
+bell
+user
+shield
+code
+gear
+
+Dashboard Grid
+
+Example layout
+
+grid-template-columns: repeat(3, 1fr)
+grid-template-rows: auto
+gap: 24px
+
+
+Cards align perfectly.
+
+Footer
+border-top: 2px solid #111111
+padding: 24px
+font-size: 12px
+display: flex
+justify-content: space-between
+color: #444444
+
+Animation Rules
+
+Minimal.
+
+transition: 0.2s ease
+
+
+Allowed effects
+
+• button hover
+• link underline
+• small color changes
+
+No:
+
+• bounce
+• shadows
+• gradients

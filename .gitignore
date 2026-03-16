@@ -1,0 +1,24 @@
+# Dependencies
+node_modules
+.pnp
+.pnp.js
+
+# Env (do not commit secrets)
+.env
+.env.local
+.env*.local
+
+# Next.js
+.next
+out
+
+# Build
+build
+dist
+
+# Local user data (passwords hashed, but keep out of git)
+data/
+
+# Debug
+npm-debug.log*
+.DS_Store
