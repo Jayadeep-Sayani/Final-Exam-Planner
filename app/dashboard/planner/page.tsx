@@ -8,6 +8,7 @@ const NAV_ITEMS = [
   { href: '/dashboard', label: 'Exams' },
   { href: '/dashboard/homework', label: 'Homework' },
   { href: '/dashboard/planner', label: 'AI Planner' },
+  { href: '/dashboard/pomodoro', label: 'Pomodoro' },
 ]
 
 type ScheduleItem = { id: string; label: string; done: boolean }
@@ -188,6 +189,7 @@ export default function PlannerPage() {
           alignItems: 'center',
           justifyContent: 'center',
           padding: 40,
+          paddingBottom: 110,
           position: 'relative',
           overflow: 'hidden',
           background: `

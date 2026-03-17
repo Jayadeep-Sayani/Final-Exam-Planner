@@ -44,6 +44,70 @@ export default function LandingPage() {
             `,
           }}
         >
+          <div aria-hidden style={{ position: 'absolute', left: '22%', top: '16%', width: 44, height: 28, transform: 'rotate(-12deg)', transformOrigin: 'center center', pointerEvents: 'none', overflow: 'visible' }}>
+            <svg style={{ position: 'absolute', left: -24, top: '50%', marginTop: -11, width: 28, height: 22 }} viewBox="0 0 28 22" fill="none">
+              <path d="M4 11 Q2 8 5 6 Q10 5 12 9 Q14 14 10 16 Q6 17 4 13 Q3 12 4 11 Z" fill={accent} opacity={0.4} />
+              <path d="M10 11 Q8 9 11 7.5 Q15 6 17 9.5 Q18 12 15 14 Q11 15 9 12 Q9 11 10 11 Z" fill={accent} opacity={0.24} />
+              <path d="M16 11 Q15 10 16.5 9 Q18 8 19 10 Q19.5 11.5 18 12 Q16.5 12.5 16 11 Z" fill={accent} opacity={0.12} />
+            </svg>
+            <svg style={{ position: 'relative', display: 'block', width: 20, height: 20 }} viewBox="0 0 24 24" fill={accent}><path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z" /><path d="M8 7h8M8 11h8" stroke="#fff" strokeWidth="1.2" fill="none" /></svg>
+          </div>
+          <div aria-hidden style={{ position: 'absolute', right: '24%', top: '12%', width: 44, height: 28, transform: 'rotate(8deg)', transformOrigin: 'center center', pointerEvents: 'none', overflow: 'visible' }}>
+            <svg style={{ position: 'absolute', right: -24, left: 'auto', top: '50%', marginTop: -11, width: 28, height: 22, transform: 'scaleX(-1)' }} viewBox="0 0 28 22" fill="none">
+              <path d="M4 11 Q2 8 5 6 Q10 5 12 9 Q14 14 10 16 Q6 17 4 13 Q3 12 4 11 Z" fill={accent} opacity={0.4} />
+              <path d="M10 11 Q8 9 11 7.5 Q15 6 17 9.5 Q18 12 15 14 Q11 15 9 12 Q9 11 10 11 Z" fill={accent} opacity={0.24} />
+              <path d="M16 11 Q15 10 16.5 9 Q18 8 19 10 Q19.5 11.5 18 12 Q16.5 12.5 16 11 Z" fill={accent} opacity={0.12} />
+            </svg>
+            <svg style={{ position: 'relative', display: 'block', width: 18, height: 18 }} viewBox="0 0 24 24" fill={accent}><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25z" /></svg>
+          </div>
+          <div aria-hidden style={{ position: 'absolute', left: '20%', top: '44%', width: 44, height: 28, transform: 'rotate(18deg)', transformOrigin: 'center center', pointerEvents: 'none', overflow: 'visible' }}>
+            <svg style={{ position: 'absolute', left: -24, top: '50%', marginTop: -11, width: 28, height: 22 }} viewBox="0 0 28 22" fill="none">
+              <path d="M4 11 Q2 8 5 6 Q10 5 12 9 Q14 14 10 16 Q6 17 4 13 Q3 12 4 11 Z" fill={accent} opacity={0.4} />
+              <path d="M10 11 Q8 9 11 7.5 Q15 6 17 9.5 Q18 12 15 14 Q11 15 9 12 Q9 11 10 11 Z" fill={accent} opacity={0.24} />
+              <path d="M16 11 Q15 10 16.5 9 Q18 8 19 10 Q19.5 11.5 18 12 Q16.5 12.5 16 11 Z" fill={accent} opacity={0.12} />
+            </svg>
+            <svg style={{ position: 'relative', display: 'block', width: 20, height: 20 }} viewBox="0 0 24 24" fill={accent}><path d="M9 21c0 .55.45 1 1 1h4c.55 0 1-.45 1-1v-1H9v1zm3-19C8.14 2 5 5.14 5 9c0 2.38 1.19 4.47 3 5.74V17c0 .55.45 1 1 1h6c.55 0 1-.45 1-1v-2.26c1.81-1.27 3-3.36 3-5.74 0-3.86-3.14-7-7-7z" /></svg>
+          </div>
+          <div aria-hidden style={{ position: 'absolute', right: '22%', top: '40%', width: 44, height: 28, transform: 'rotate(-6deg)', transformOrigin: 'center center', pointerEvents: 'none', overflow: 'visible' }}>
+            <svg style={{ position: 'absolute', right: -24, left: 'auto', top: '50%', marginTop: -11, width: 28, height: 22, transform: 'scaleX(-1)' }} viewBox="0 0 28 22" fill="none">
+              <path d="M4 11 Q2 8 5 6 Q10 5 12 9 Q14 14 10 16 Q6 17 4 13 Q3 12 4 11 Z" fill={accent} opacity={0.4} />
+              <path d="M10 11 Q8 9 11 7.5 Q15 6 17 9.5 Q18 12 15 14 Q11 15 9 12 Q9 11 10 11 Z" fill={accent} opacity={0.24} />
+              <path d="M16 11 Q15 10 16.5 9 Q18 8 19 10 Q19.5 11.5 18 12 Q16.5 12.5 16 11 Z" fill={accent} opacity={0.12} />
+            </svg>
+            <svg style={{ position: 'relative', display: 'block', width: 18, height: 18 }} viewBox="0 0 24 24" fill={accent}><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z" /></svg>
+          </div>
+          <div aria-hidden style={{ position: 'absolute', left: '24%', top: '70%', width: 44, height: 28, transform: 'rotate(-22deg)', transformOrigin: 'center center', pointerEvents: 'none', overflow: 'visible' }}>
+            <svg style={{ position: 'absolute', left: -24, top: '50%', marginTop: -11, width: 28, height: 22 }} viewBox="0 0 28 22" fill="none">
+              <path d="M4 11 Q2 8 5 6 Q10 5 12 9 Q14 14 10 16 Q6 17 4 13 Q3 12 4 11 Z" fill={accent} opacity={0.4} />
+              <path d="M10 11 Q8 9 11 7.5 Q15 6 17 9.5 Q18 12 15 14 Q11 15 9 12 Q9 11 10 11 Z" fill={accent} opacity={0.24} />
+              <path d="M16 11 Q15 10 16.5 9 Q18 8 19 10 Q19.5 11.5 18 12 Q16.5 12.5 16 11 Z" fill={accent} opacity={0.12} />
+            </svg>
+            <svg style={{ position: 'relative', display: 'block', width: 19, height: 19 }} viewBox="0 0 24 24" fill={accent}><circle cx="12" cy="12" r="10" /><path d="M12 6v6l4 2" stroke="#fff" strokeWidth="1.2" fill="none" /></svg>
+          </div>
+          <div aria-hidden style={{ position: 'absolute', right: '20%', top: '64%', width: 44, height: 28, transform: 'rotate(14deg)', transformOrigin: 'center center', pointerEvents: 'none', overflow: 'visible' }}>
+            <svg style={{ position: 'absolute', right: -24, left: 'auto', top: '50%', marginTop: -11, width: 28, height: 22, transform: 'scaleX(-1)' }} viewBox="0 0 28 22" fill="none">
+              <path d="M4 11 Q2 8 5 6 Q10 5 12 9 Q14 14 10 16 Q6 17 4 13 Q3 12 4 11 Z" fill={accent} opacity={0.4} />
+              <path d="M10 11 Q8 9 11 7.5 Q15 6 17 9.5 Q18 12 15 14 Q11 15 9 12 Q9 11 10 11 Z" fill={accent} opacity={0.24} />
+              <path d="M16 11 Q15 10 16.5 9 Q18 8 19 10 Q19.5 11.5 18 12 Q16.5 12.5 16 11 Z" fill={accent} opacity={0.12} />
+            </svg>
+            <svg style={{ position: 'relative', display: 'block', width: 20, height: 20 }} viewBox="0 0 24 24" fill={accent}><path d="M19 4h-1V2h-2v2H8V2H6v2H5c-1.11 0-1.99.9-1.99 2L3 20c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V9h14v11z" /></svg>
+          </div>
+          <div aria-hidden style={{ position: 'absolute', left: '22%', bottom: '14%', width: 44, height: 28, transform: 'rotate(5deg)', transformOrigin: 'center center', pointerEvents: 'none', overflow: 'visible' }}>
+            <svg style={{ position: 'absolute', left: -24, top: '50%', marginTop: -11, width: 28, height: 22 }} viewBox="0 0 28 22" fill="none">
+              <path d="M4 11 Q2 8 5 6 Q10 5 12 9 Q14 14 10 16 Q6 17 4 13 Q3 12 4 11 Z" fill={accent} opacity={0.4} />
+              <path d="M10 11 Q8 9 11 7.5 Q15 6 17 9.5 Q18 12 15 14 Q11 15 9 12 Q9 11 10 11 Z" fill={accent} opacity={0.24} />
+              <path d="M16 11 Q15 10 16.5 9 Q18 8 19 10 Q19.5 11.5 18 12 Q16.5 12.5 16 11 Z" fill={accent} opacity={0.12} />
+            </svg>
+            <svg style={{ position: 'relative', display: 'block', width: 19, height: 19 }} viewBox="0 0 24 24" fill={accent}><path d="M5 13.18v4L12 21l7-3.82v-4L12 17l-7-3.82zM12 3L1 9l11 6 9-4.91V17h2V9L12 3z" /></svg>
+          </div>
+          <div aria-hidden style={{ position: 'absolute', right: '24%', bottom: '20%', width: 44, height: 28, transform: 'rotate(-16deg)', transformOrigin: 'center center', pointerEvents: 'none', overflow: 'visible' }}>
+            <svg style={{ position: 'absolute', right: -24, left: 'auto', top: '50%', marginTop: -11, width: 28, height: 22, transform: 'scaleX(-1)' }} viewBox="0 0 28 22" fill="none">
+              <path d="M4 11 Q2 8 5 6 Q10 5 12 9 Q14 14 10 16 Q6 17 4 13 Q3 12 4 11 Z" fill={accent} opacity={0.4} />
+              <path d="M10 11 Q8 9 11 7.5 Q15 6 17 9.5 Q18 12 15 14 Q11 15 9 12 Q9 11 10 11 Z" fill={accent} opacity={0.24} />
+              <path d="M16 11 Q15 10 16.5 9 Q18 8 19 10 Q19.5 11.5 18 12 Q16.5 12.5 16 11 Z" fill={accent} opacity={0.12} />
+            </svg>
+            <svg style={{ position: 'relative', display: 'block', width: 18, height: 18 }} viewBox="0 0 24 24" fill={accent}><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" /></svg>
+          </div>
           <div style={{ position: 'relative', zIndex: 1, maxWidth: 720, width: '100%' }}>
             <Link
               href="/"

@@ -50,7 +50,7 @@ export function Header({ navItems, rightLink, rightButton }: HeaderProps) {
       </Link>
       {navItems && navItems.length > 0 ? (
         <nav style={{ display: 'flex', alignItems: 'center', gap: 24, marginLeft: 24 }}>
-          {navItems.map((item) => {
+          {navItems.slice(0, 3).map((item) => {
             const isActive =
               pathname === item.href ||
               (item.href === '/dashboard' && pathname.startsWith('/dashboard/exam'))
@@ -67,6 +67,36 @@ export function Header({ navItems, rightLink, rightButton }: HeaderProps) {
               </Link>
             )
           })}
+          {navItems.length > 3 ? (
+            <>
+              <span
+                aria-hidden
+                style={{
+                  width: 1,
+                  height: 20,
+                  background: '#ccc',
+                  flexShrink: 0,
+                }}
+              />
+              {navItems.slice(3).map((item) => {
+                const isActive =
+                  pathname === item.href ||
+                  (item.href === '/dashboard' && pathname.startsWith('/dashboard/exam'))
+                return (
+                  <Link
+                    key={item.href}
+                    href={item.href}
+                    className="header-nav-action"
+                    style={{
+                      borderBottomColor: isActive ? 'var(--color-accent)' : 'transparent',
+                    }}
+                  >
+                    {item.label}
+                  </Link>
+                )
+              })}
+            </>
+          ) : null}
         </nav>
       ) : null}
       <div style={{ marginLeft: 'auto' }}>

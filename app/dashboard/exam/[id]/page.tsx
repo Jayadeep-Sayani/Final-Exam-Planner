@@ -250,6 +250,7 @@ export default function ExamPage({ params }: { params: { id: string } }) {
           { href: '/dashboard', label: 'Exams' },
           { href: '/dashboard/homework', label: 'Homework' },
           { href: '/dashboard/planner', label: 'AI Planner' },
+          { href: '/dashboard/pomodoro', label: 'Pomodoro' },
         ]}
         rightButton={{ label: 'Sign out', onClick: () => setShowLogoutModal(true) }}
       />
@@ -508,6 +509,7 @@ export default function ExamPage({ params }: { params: { id: string } }) {
           margin: '0 auto',
           padding: 40,
           minHeight: 'calc(100vh - 72px)',
+          paddingBottom: 110,
         }}
       >
         <Link
