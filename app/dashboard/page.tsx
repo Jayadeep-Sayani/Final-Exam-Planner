@@ -211,6 +211,7 @@ export default function DashboardPage() {
           { href: '/dashboard/homework', label: 'Homework' },
           { href: '/dashboard/planner', label: 'AI Planner' },
           { href: '/dashboard/pomodoro', label: 'Pomodoro' },
+          { href: '/dashboard/study', label: 'Study' },
         ]}
         rightButton={{ label: 'Sign out', onClick: () => setShowLogoutModal(true) }}
       />

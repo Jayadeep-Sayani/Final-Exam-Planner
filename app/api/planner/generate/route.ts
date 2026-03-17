@@ -2,7 +2,6 @@ import { NextResponse } from 'next/server'
 import { getCurrentUser } from '@/lib/auth'
 import {
   findUserById,
-  getHomework,
   updatePlannerSchedule,
   type PlannerSchedule,
   type PlannerScheduleItem,
@@ -43,7 +42,7 @@ export async function POST() {
   }
 
   const exams = dbUser.exams ?? []
-  const allHomework = await getHomework(user.userId)
+  const allHomework = dbUser.homework ?? []
   const unfinishedHomework = allHomework.filter((h) => h.status !== 'done')
   const today = todayServerDate()
 

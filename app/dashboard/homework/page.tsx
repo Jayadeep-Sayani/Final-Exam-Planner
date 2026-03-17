@@ -10,6 +10,7 @@ const NAV_ITEMS = [
   { href: '/dashboard/homework', label: 'Homework' },
   { href: '/dashboard/planner', label: 'AI Planner' },
   { href: '/dashboard/pomodoro', label: 'Pomodoro' },
+  { href: '/dashboard/study', label: 'Study' },
 ]
 
 type Homework = {

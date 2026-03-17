@@ -1,6 +1,5 @@
 import { cookies } from 'next/headers'
 import { verifyIdToken } from '@/lib/firebase-admin'
-import { ensureUserDoc } from '@/lib/users'
 
 export const COOKIE_NAME = 'locked_session'
 
@@ -15,9 +14,7 @@ export async function getCurrentUser(): Promise<AuthPayload | null> {
   if (!token) return null
   try {
     const { uid, email } = await verifyIdToken(token)
-    const userEmail = email ?? ''
-    await ensureUserDoc(uid, userEmail)
-    return { userId: uid, email: userEmail }
+    return { userId: uid, email: email ?? '' }
   } catch {
     return null
   }
