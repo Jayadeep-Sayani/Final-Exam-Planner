@@ -147,18 +147,20 @@ export default function StudyPage() {
         style={{
           display: 'flex',
           flexDirection: 'column',
+          alignItems: 'center',
+          justifyContent: 'center',
           minHeight: 'calc(100vh - 72px)',
           paddingBottom: 100,
           padding: 24,
           background: '#fafafa',
         }}
       >
-        <div style={{ maxWidth: 560, width: '100%', margin: '0 auto', display: 'flex', flexDirection: 'column', gap: 32 }}>
+        <div style={{ maxWidth: 560, width: '100%', display: 'flex', flexDirection: 'column', gap: 32, textAlign: 'center' }}>
           <div>
             <h2 style={{ fontSize: 18, fontWeight: 600, margin: '0 0 16px', color: '#111' }}>Study links</h2>
             <p style={{ fontSize: 14, color: '#666', margin: '0 0 16px' }}>Click to open in a new tab.</p>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-              <div style={{ display: 'flex', flexWrap: 'wrap', gap: 10 }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 12, alignItems: 'center' }}>
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: 10, justifyContent: 'center' }}>
                 {DEFAULT_LINKS.map((item, index) => (
                   <button
                     key={`default-${index}`}
@@ -179,7 +181,7 @@ export default function StudyPage() {
                 ))}
               </div>
               {customWithColor.length > 0 && (
-                <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, alignItems: 'center' }}>
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, alignItems: 'center', justifyContent: 'center' }}>
                   {customWithColor.map((item, index) => (
                     <span key={`custom-${index}`} style={{ display: 'inline-flex', alignItems: 'center', gap: 2 }}>
                       <button
@@ -257,7 +259,7 @@ export default function StudyPage() {
                 }}
                 aria-label="Link URL"
               />
-              <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 10, justifyContent: 'center' }}>
                 <label style={{ fontSize: 14, color: '#444' }} htmlFor="study-link-color">
                   Border color
                 </label>
@@ -270,7 +272,7 @@ export default function StudyPage() {
                   aria-label="Border color"
                 />
               </div>
-              <button type="button" onClick={addLink} className="btn-primary" style={{ alignSelf: 'flex-start', padding: '10px 20px' }}>
+              <button type="button" onClick={addLink} className="btn-primary" style={{ alignSelf: 'center', padding: '10px 20px' }}>
                 Add link
               </button>
             </div>
