@@ -1,7 +1,17 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { DragHandleDots } from '@/components/DragHandleDots'
+import {
+  DndContext,
+  type DragEndEvent,
+  PointerSensor,
+  closestCenter,
+  useSensor,
+  useSensors,
+} from '@dnd-kit/core'
+import { SortableContext, arrayMove, verticalListSortingStrategy } from '@dnd-kit/sortable'
+import { HomeworkDoneRow } from '@/components/homework/HomeworkDoneRow'
+import { HomeworkSortableRow } from '@/components/homework/HomeworkSortableRow'
 import { Header } from '@/components/Header'
 import { useToast } from '@/components/ToastContext'
 import { parseLocalDate, getTodayLocalDateString } from '@/lib/dateUtils'
@@ -225,17 +235,22 @@ export default function HomeworkPage() {
     }
   }
 
-  function reorderUnfinishedRows(dragId: string, dropId: string) {
-    if (dragId === dropId) return
+  const sensors = useSensors(
+    useSensor(PointerSensor, {
+      activationConstraint: { distance: 8 },
+    })
+  )
+
+  function handleHomeworkDragEnd(event: DragEndEvent) {
+    const { active, over } = event
+    if (!over || active.id === over.id) return
     const ordered = orderHomeworkDisplay(homeworks)
     const unfinished = ordered.filter((h) => h.status !== 'done')
     const done = ordered.filter((h) => h.status === 'done')
-    const from = unfinished.findIndex((h) => h.id === dragId)
-    const to = unfinished.findIndex((h) => h.id === dropId)
-    if (from < 0 || to < 0) return
-    const nextU = [...unfinished]
-    const [removed] = nextU.splice(from, 1)
-    nextU.splice(to, 0, removed)
+    const oldIndex = unfinished.findIndex((h) => h.id === active.id)
+    const newIndex = unfinished.findIndex((h) => h.id === over.id)
+    if (oldIndex < 0 || newIndex < 0) return
+    const nextU = arrayMove(unfinished, oldIndex, newIndex)
     void persistHomeworkOrder([...nextU, ...done])
   }
 
@@ -570,241 +585,64 @@ export default function HomeworkPage() {
             No homework yet, add one.
           </p>
         ) : null}
-        <ul style={{ listStyle: 'none', margin: 0, padding: 0 }}>
-          {sortedHomeworks.map((hw) => {
-            const isDone = hw.status === 'done'
-            const d = daysLeft(hw.dueDate)
-            const daysLabel = d > 0 ? `${d} day${d === 1 ? '' : 's'} left` : d === 0 ? 'Due today' : `${Math.abs(d)} day${Math.abs(d) === 1 ? '' : 's'} overdue`
-            const urgency = urgencyColor(d)
-            return (
-              <li
-                key={hw.id}
-                onDragOver={(e) => {
-                  if (!isDone) e.preventDefault()
-                }}
-                onDrop={(e) => {
-                  e.preventDefault()
-                  if (isDone) return
-                  const dragId = e.dataTransfer.getData('text/plain')
-                  if (dragId) reorderUnfinishedRows(dragId, hw.id)
-                }}
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: 12,
-                  marginBottom: 12,
-                  padding: '12px 16px',
-                  border: '2px solid #111111',
-                  background: '#ffffff',
-                }}
-              >
-                <div
-                  style={{
-                    width: 22,
-                    flexShrink: 0,
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                  }}
-                >
-                  {isDone ? (
-                    <span style={{ color: '#111111', fontSize: 18 }} aria-hidden>✓</span>
-                  ) : (
-                    <div
-                      draggable
-                      onDragStart={(e) => {
-                        e.dataTransfer.setData('text/plain', hw.id)
-                        e.dataTransfer.effectAllowed = 'move'
-                      }}
-                      style={{ touchAction: 'none' }}
-                      aria-label="Drag to reorder"
-                    >
-                      <DragHandleDots />
-                    </div>
-                  )}
-                </div>
-                <div style={{ flex: 1, minWidth: 0, display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 8 }}>
-                  {editingHw?.id === hw.id && editingHw.field === 'assignment' ? (
-                    <input
-                      type="text"
-                      value={editHwText}
-                      onChange={(e) => setEditHwText(e.target.value)}
-                      onBlur={saveHwField}
-                      onKeyDown={(e) => {
-                        if (e.key === 'Enter') {
-                          e.preventDefault()
-                          saveHwField()
-                        }
-                        if (e.key === 'Escape') cancelEditHw()
-                      }}
-                      autoFocus
-                      disabled={updatingId === hw.id}
-                      style={{
-                        fontSize: 16,
-                        fontWeight: 600,
-                        color: '#111111',
-                        padding: '4px 8px',
-                        border: '2px solid #111111',
-                        background: '#fff',
-                        font: 'inherit',
-                        minWidth: 120,
-                        flex: '1 1 140px',
-                      }}
-                    />
-                  ) : (
-                    <button
-                      type="button"
-                      onClick={() => startEditHw(hw, 'assignment')}
-                      disabled={updatingId === hw.id}
-                      style={{
-                        fontSize: 16,
-                        fontWeight: 600,
-                        color: '#111111',
-                        textDecoration: isDone ? 'line-through' : 'none',
-                        opacity: isDone ? 0.7 : 1,
-                        padding: 0,
-                        border: 'none',
-                        background: 'none',
-                        font: 'inherit',
-                        cursor: 'text',
-                        textAlign: 'left',
-                      }}
-                    >
-                      {hw.assignmentName}
-                    </button>
-                  )}
-                  <span
-                    aria-hidden
-                    style={{
-                      color: '#d4d4d4',
-                      fontSize: 18,
-                      fontWeight: 300,
-                      userSelect: 'none',
-                      lineHeight: 1,
-                    }}
-                  >
-                    |
-                  </span>
-                  {editingHw?.id === hw.id && editingHw.field === 'course' ? (
-                    <input
-                      type="text"
-                      value={editHwText}
-                      onChange={(e) => setEditHwText(e.target.value)}
-                      onBlur={saveHwField}
-                      onKeyDown={(e) => {
-                        if (e.key === 'Enter') {
-                          e.preventDefault()
-                          saveHwField()
-                        }
-                        if (e.key === 'Escape') cancelEditHw()
-                      }}
-                      autoFocus
-                      disabled={updatingId === hw.id}
-                      style={{
-                        fontSize: 12,
-                        color: '#888888',
-                        padding: '4px 8px',
-                        border: '2px solid #111111',
-                        background: '#fff',
-                        font: 'inherit',
-                        fontWeight: 400,
-                        minWidth: 100,
-                        flex: '1 1 120px',
-                      }}
-                    />
-                  ) : (
-                    <button
-                      type="button"
-                      onClick={() => startEditHw(hw, 'course')}
-                      disabled={updatingId === hw.id}
-                      style={{
-                        fontSize: 12,
-                        color: '#888888',
-                        fontWeight: 400,
-                        padding: 0,
-                        border: 'none',
-                        background: 'none',
-                        font: 'inherit',
-                        cursor: 'text',
-                        textAlign: 'left',
-                      }}
-                    >
-                      {hw.courseName}
-                    </button>
-                  )}
-                  <span style={{ fontSize: 13, marginLeft: 8, color: isDone ? '#666666' : urgency, fontWeight: 600 }}>
-                    {daysLabel}
-                  </span>
-                </div>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                  <div style={{ display: 'flex', gap: 4 }}>
-                    {!isDone && (['not_started', 'in_progress'] as const).map((s) => (
-                      <button
-                        key={s}
-                        type="button"
-                        onClick={() => setStatus(hw.id, s)}
-                        disabled={updatingId === hw.id}
-                        style={{
-                          padding: '6px 12px',
-                          border: '2px solid #111111',
-                          background: hw.status === s ? '#FF6A00' : '#ffffff',
-                          color: hw.status === s ? '#ffffff' : '#111111',
-                          font: 'inherit',
-                          fontSize: 12,
-                          fontWeight: 600,
-                          textTransform: 'uppercase',
-                          cursor: updatingId === hw.id ? 'not-allowed' : 'pointer',
-                        }}
-                      >
-                        {s === 'not_started' ? 'Not started' : 'In progress'}
-                      </button>
-                    ))}
-                    {!isDone && (
-                      <button
-                        type="button"
-                        onClick={() => { setHomeworkToMarkDone(hw); setShowDoneConfirm(true) }}
-                        disabled={updatingId === hw.id}
-                        style={{
-                          padding: '6px 12px',
-                          border: '2px solid #111111',
-                          background: '#ffffff',
-                          color: '#111111',
-                          font: 'inherit',
-                          fontSize: 12,
-                          fontWeight: 600,
-                          textTransform: 'uppercase',
-                          cursor: updatingId === hw.id ? 'not-allowed' : 'pointer',
-                        }}
-                      >
-                        Mark as done
-                      </button>
-                    )}
-                    {isDone && <span style={{ fontSize: 12, fontWeight: 600, color: '#666666', textTransform: 'uppercase' }}>Done</span>}
-                  </div>
-                  <button
-                    type="button"
-                    onClick={() => removeHomework(hw.id)}
-                    style={{
-                      width: 28,
-                      height: 28,
-                      padding: 0,
-                      border: 'none',
-                      background: 'none',
-                      color: '#c00',
-                      fontSize: 18,
-                      fontWeight: 700,
-                      lineHeight: 1,
-                      cursor: 'pointer',
-                    }}
-                    aria-label="Remove"
-                  >
-                    ×
-                  </button>
-                </div>
-              </li>
-            )
-          })}
-        </ul>
+        {(() => {
+          const unfinished = sortedHomeworks.filter((h) => h.status !== 'done')
+          const done = sortedHomeworks.filter((h) => h.status === 'done')
+          const rowProps = {
+            editingHw,
+            editHwText,
+            updatingId,
+            startEditHw,
+            saveHwField,
+            cancelEditHw,
+            setEditHwText,
+            removeHomework,
+          }
+          return (
+            <>
+              <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleHomeworkDragEnd}>
+                <SortableContext items={unfinished.map((h) => h.id)} strategy={verticalListSortingStrategy}>
+                  <ul style={{ listStyle: 'none', margin: 0, padding: 0 }}>
+                    {unfinished.map((hw) => {
+                      const d = daysLeft(hw.dueDate)
+                      const daysLabel =
+                        d > 0
+                          ? `${d} day${d === 1 ? '' : 's'} left`
+                          : d === 0
+                            ? 'Due today'
+                            : `${Math.abs(d)} day${Math.abs(d) === 1 ? '' : 's'} overdue`
+                      const urgency = urgencyColor(d)
+                      return (
+                        <HomeworkSortableRow
+                          key={hw.id}
+                          hw={hw}
+                          daysLabel={daysLabel}
+                          urgency={urgency}
+                          setStatus={setStatus}
+                          setHomeworkToMarkDone={setHomeworkToMarkDone}
+                          setShowDoneConfirm={setShowDoneConfirm}
+                          {...rowProps}
+                        />
+                      )
+                    })}
+                  </ul>
+                </SortableContext>
+              </DndContext>
+              <ul style={{ listStyle: 'none', margin: 0, padding: 0 }}>
+                {done.map((hw) => {
+                  const d = daysLeft(hw.dueDate)
+                  const daysLabel =
+                    d > 0
+                      ? `${d} day${d === 1 ? '' : 's'} left`
+                      : d === 0
+                        ? 'Due today'
+                        : `${Math.abs(d)} day${Math.abs(d) === 1 ? '' : 's'} overdue`
+                  return <HomeworkDoneRow key={hw.id} hw={hw} daysLabel={daysLabel} {...rowProps} />
+                })}
+              </ul>
+            </>
+          )
+        })()}
       </main>
     </>
   )

@@ -3,7 +3,17 @@
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-import { DragHandleDots } from '@/components/DragHandleDots'
+import {
+  DndContext,
+  type DragEndEvent,
+  PointerSensor,
+  closestCenter,
+  useSensor,
+  useSensors,
+} from '@dnd-kit/core'
+import { SortableContext, arrayMove, verticalListSortingStrategy } from '@dnd-kit/sortable'
+import { TopicDoneRow } from '@/components/exam/TopicDoneRow'
+import { TopicSortableRow } from '@/components/exam/TopicSortableRow'
 import { Header } from '@/components/Header'
 import { useToast } from '@/components/ToastContext'
 import { parseLocalDate } from '@/lib/dateUtils'
@@ -26,18 +36,6 @@ function sortTopicsByDone(topics: Topic[]): Topic[] {
   const active = topics.filter((t) => t.difficulty !== 'easy')
   const done = topics.filter((t) => t.difficulty === 'easy')
   return [...active, ...done]
-}
-
-function reorderActiveTopics(topics: Topic[], dragId: string, dropId: string): Topic[] {
-  const active = topics.filter((t) => t.difficulty !== 'easy')
-  const done = topics.filter((t) => t.difficulty === 'easy')
-  const from = active.findIndex((t) => t.id === dragId)
-  const to = active.findIndex((t) => t.id === dropId)
-  if (from < 0 || to < 0 || dragId === dropId) return topics
-  const next = [...active]
-  const [removed] = next.splice(from, 1)
-  next.splice(to, 0, removed)
-  return sortTopicsByDone([...next, ...done])
 }
 
 const todayAtMidnight = () => {
@@ -199,13 +197,6 @@ export default function ExamPage({ params }: { params: { id: string } }) {
     setEditingLabel('')
   }
 
-  function reorderTopicRows(dragId: string, dropId: string) {
-    if (!exam) return
-    const merged = reorderActiveTopics(exam.topics ?? [], dragId, dropId)
-    setExam({ ...exam, topics: merged })
-    saveTopics(merged)
-  }
-
   function openSettingsModal() {
     if (exam) {
       setSettingsForm({
@@ -265,6 +256,28 @@ export default function ExamPage({ params }: { params: { id: string } }) {
     } catch {
       setLoggingOut(false)
     }
+  }
+
+  const sensors = useSensors(
+    useSensor(PointerSensor, {
+      activationConstraint: { distance: 8 },
+    })
+  )
+
+  function handleTopicDragEnd(event: DragEndEvent) {
+    if (!exam) return
+    const { active, over } = event
+    if (!over || active.id === over.id) return
+    const all = exam.topics ?? []
+    const activeList = all.filter((t) => t.difficulty !== 'easy')
+    const done = all.filter((t) => t.difficulty === 'easy')
+    const oldIndex = activeList.findIndex((t) => t.id === active.id)
+    const newIndex = activeList.findIndex((t) => t.id === over.id)
+    if (oldIndex < 0 || newIndex < 0) return
+    const nextActive = arrayMove(activeList, oldIndex, newIndex)
+    const merged = sortTopicsByDone([...nextActive, ...done])
+    setExam({ ...exam, topics: merged })
+    saveTopics(merged)
   }
 
   const topics = sortTopicsByDone(exam?.topics ?? [])
@@ -776,152 +789,39 @@ export default function ExamPage({ params }: { params: { id: string } }) {
                 No topics yet, add a topic.
               </p>
             ) : null}
-            <ul style={{ listStyle: 'none', margin: 0, padding: 0 }}>
-              {topics.map((topic) => {
-                const isDone = topic.difficulty === 'easy'
-                return (
-                  <li
-                    key={topic.id}
-                    onDragOver={(e) => {
-                      if (!isDone) e.preventDefault()
-                    }}
-                    onDrop={(e) => {
-                      e.preventDefault()
-                      if (isDone) return
-                      const dragId = e.dataTransfer.getData('text/plain')
-                      if (dragId) reorderTopicRows(dragId, topic.id)
-                    }}
-                    style={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: 12,
-                      marginBottom: 12,
-                      padding: '12px 16px',
-                      border: '2px solid #111111',
-                      background: '#ffffff',
-                    }}
-                  >
-                    <div
-                      style={{
-                        width: 22,
-                        flexShrink: 0,
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                      }}
-                    >
-                      {isDone ? (
-                        <span style={{ color: '#111111', fontSize: 18 }} aria-hidden>✓</span>
-                      ) : (
-                        <div
-                          draggable
-                          onDragStart={(e) => {
-                            e.dataTransfer.setData('text/plain', topic.id)
-                            e.dataTransfer.effectAllowed = 'move'
-                          }}
-                          style={{ touchAction: 'none' }}
-                          aria-label="Drag to reorder"
-                        >
-                          <DragHandleDots />
-                        </div>
-                      )}
-                    </div>
-                    {editingTopicId === topic.id ? (
-                      <input
-                        type="text"
-                        value={editingLabel}
-                        onChange={(e) => setEditingLabel(e.target.value)}
-                        onBlur={saveEditingTopic}
-                        onKeyDown={(e) => {
-                          if (e.key === 'Enter') {
-                            e.preventDefault()
-                            saveEditingTopic()
-                          }
-                          if (e.key === 'Escape') cancelEditingTopic()
-                        }}
-                        autoFocus
-                        style={{
-                          flex: 1,
-                          fontSize: 16,
-                          color: '#111111',
-                          padding: '4px 0',
-                          border: 'none',
-                          borderBottom: '2px solid #111111',
-                          background: 'transparent',
-                          font: 'inherit',
-                          outline: 'none',
-                        }}
-                      />
-                    ) : (
-                      <button
-                        type="button"
-                        onClick={() => startEditingTopic(topic)}
-                        style={{
-                          flex: 1,
-                          textAlign: 'left',
-                          fontSize: 16,
-                          color: '#111111',
-                          textDecoration: isDone ? 'line-through' : 'none',
-                          opacity: isDone ? 0.7 : 1,
-                          padding: 0,
-                          border: 'none',
-                          background: 'none',
-                          font: 'inherit',
-                          cursor: 'text',
-                        }}
-                      >
-                        {topic.label}
-                      </button>
-                    )}
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                      <div style={{ display: 'flex', gap: 4 }}>
-                        {(['hard', 'medium', 'easy'] as const).map((d) => (
-                          <button
-                            key={d}
-                            type="button"
-                            onClick={() => setTopicDifficulty(topic.id, d)}
-                            disabled={saving}
-                            style={{
-                              padding: '6px 12px',
-                              border: '2px solid #111111',
-                              background: topic.difficulty === d ? '#FF6A00' : '#ffffff',
-                              color: topic.difficulty === d ? '#ffffff' : '#111111',
-                              font: 'inherit',
-                              fontSize: 12,
-                              fontWeight: 600,
-                              textTransform: 'uppercase',
-                              cursor: saving ? 'not-allowed' : 'pointer',
-                            }}
-                          >
-                            {d}
-                          </button>
+            {(() => {
+              const activeTopics = topics.filter((t) => t.difficulty !== 'easy')
+              const doneTopics = topics.filter((t) => t.difficulty === 'easy')
+              const topicRowProps = {
+                editingTopicId,
+                editingLabel,
+                setEditingLabel,
+                saveEditingTopic,
+                cancelEditingTopic,
+                startEditingTopic,
+                setTopicDifficulty,
+                removeTopic,
+                saving,
+              }
+              return (
+                <>
+                  <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleTopicDragEnd}>
+                    <SortableContext items={activeTopics.map((t) => t.id)} strategy={verticalListSortingStrategy}>
+                      <ul style={{ listStyle: 'none', margin: 0, padding: 0 }}>
+                        {activeTopics.map((topic) => (
+                          <TopicSortableRow key={topic.id} topic={topic} {...topicRowProps} />
                         ))}
-                      </div>
-                      <button
-                        type="button"
-                        onClick={() => removeTopic(topic.id)}
-                        disabled={saving}
-                        style={{
-                          width: 28,
-                          height: 28,
-                          padding: 0,
-                          border: 'none',
-                          background: 'none',
-                          color: '#c00',
-                          fontSize: 18,
-                          fontWeight: 700,
-                          lineHeight: 1,
-                          cursor: saving ? 'not-allowed' : 'pointer',
-                        }}
-                        aria-label="Remove topic"
-                      >
-                        ×
-                      </button>
-                    </div>
-                  </li>
-                )
-              })}
-            </ul>
+                      </ul>
+                    </SortableContext>
+                  </DndContext>
+                  <ul style={{ listStyle: 'none', margin: 0, padding: 0 }}>
+                    {doneTopics.map((topic) => (
+                      <TopicDoneRow key={topic.id} topic={topic} {...topicRowProps} />
+                    ))}
+                  </ul>
+                </>
+              )
+            })()}
           </>
             );
           })()
