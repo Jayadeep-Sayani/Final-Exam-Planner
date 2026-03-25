@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import { DragHandleDots } from '@/components/DragHandleDots'
 import { Header } from '@/components/Header'
 import { useToast } from '@/components/ToastContext'
 import { parseLocalDate, getTodayLocalDateString } from '@/lib/dateUtils'
@@ -36,8 +37,8 @@ function urgencyColor(days: number): string {
   return '#dc2626'
 }
 
-function sortHomeworks(list: Homework[]): Homework[] {
-  const unfinished = list.filter((h) => h.status !== 'done').sort((a, b) => a.dueDate.localeCompare(b.dueDate))
+function orderHomeworkDisplay(list: Homework[]): Homework[] {
+  const unfinished = list.filter((h) => h.status !== 'done')
   const done = list.filter((h) => h.status === 'done')
   return [...unfinished, ...done]
 }
@@ -65,7 +66,7 @@ export default function HomeworkPage() {
     fetch('/api/homework', { credentials: 'include' })
       .then((res) => (res.ok ? res.json() : { homework: [] }))
       .then((data) => {
-        if (!cancelled && Array.isArray(data.homework)) setHomeworks(sortHomeworks(data.homework))
+        if (!cancelled && Array.isArray(data.homework)) setHomeworks(orderHomeworkDisplay(data.homework))
       })
       .finally(() => {
         if (!cancelled) setLoading(false)
@@ -105,7 +106,7 @@ export default function HomeworkPage() {
       })
       const data = await res.json()
       if (res.ok && Array.isArray(data.homework)) {
-        setHomeworks(sortHomeworks(data.homework))
+        setHomeworks(orderHomeworkDisplay(data.homework))
         setShowAddModal(false)
         showToast('Homework added')
       }
@@ -125,7 +126,7 @@ export default function HomeworkPage() {
       })
       const data = await res.json()
       if (res.ok && data.homework) {
-        setHomeworks((prev) => sortHomeworks(prev.map((h) => (h.id === id ? data.homework : h))))
+        setHomeworks((prev) => orderHomeworkDisplay(prev.map((h) => (h.id === id ? data.homework : h))))
       }
     } finally {
       setUpdatingId(null)
@@ -147,7 +148,7 @@ export default function HomeworkPage() {
       })
       const data = await res.json()
       if (res.ok && data.homework) {
-        setHomeworks((prev) => sortHomeworks(prev.map((h) => (h.id === id ? data.homework : h))))
+        setHomeworks((prev) => orderHomeworkDisplay(prev.map((h) => (h.id === id ? data.homework : h))))
         showToast('Assignment finished')
       }
     } finally {
@@ -193,7 +194,7 @@ export default function HomeworkPage() {
       })
       const data = await res.json()
       if (res.ok && data.homework) {
-        setHomeworks((prev) => sortHomeworks(prev.map((h) => (h.id === id ? data.homework : h))))
+        setHomeworks((prev) => orderHomeworkDisplay(prev.map((h) => (h.id === id ? data.homework : h))))
         showToast('Updated')
       }
     } finally {
@@ -202,7 +203,41 @@ export default function HomeworkPage() {
     }
   }
 
-  const sortedHomeworks = sortHomeworks(homeworks)
+  const sortedHomeworks = orderHomeworkDisplay(homeworks)
+
+  async function persistHomeworkOrder(next: Homework[]) {
+    const prev = homeworks
+    setHomeworks(next)
+    try {
+      const res = await fetch('/api/homework/reorder', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({ ids: next.map((h) => h.id) }),
+      })
+      if (!res.ok) {
+        setHomeworks(prev)
+        showToast('Could not save order')
+      }
+    } catch {
+      setHomeworks(prev)
+      showToast('Could not save order')
+    }
+  }
+
+  function reorderUnfinishedRows(dragId: string, dropId: string) {
+    if (dragId === dropId) return
+    const ordered = orderHomeworkDisplay(homeworks)
+    const unfinished = ordered.filter((h) => h.status !== 'done')
+    const done = ordered.filter((h) => h.status === 'done')
+    const from = unfinished.findIndex((h) => h.id === dragId)
+    const to = unfinished.findIndex((h) => h.id === dropId)
+    if (from < 0 || to < 0) return
+    const nextU = [...unfinished]
+    const [removed] = nextU.splice(from, 1)
+    nextU.splice(to, 0, removed)
+    void persistHomeworkOrder([...nextU, ...done])
+  }
 
   async function handleConfirmSignOut() {
     setLoggingOut(true)
@@ -544,6 +579,15 @@ export default function HomeworkPage() {
             return (
               <li
                 key={hw.id}
+                onDragOver={(e) => {
+                  if (!isDone) e.preventDefault()
+                }}
+                onDrop={(e) => {
+                  e.preventDefault()
+                  if (isDone) return
+                  const dragId = e.dataTransfer.getData('text/plain')
+                  if (dragId) reorderUnfinishedRows(dragId, hw.id)
+                }}
                 style={{
                   display: 'flex',
                   alignItems: 'center',
@@ -554,19 +598,31 @@ export default function HomeworkPage() {
                   background: '#ffffff',
                 }}
               >
-                {isDone ? (
-                  <span style={{ color: '#111111', fontSize: 18 }} aria-hidden>✓</span>
-                ) : (
-                  <span
-                    style={{
-                      width: 8,
-                      height: 8,
-                      background: '#FF6A00',
-                      flexShrink: 0,
-                    }}
-                    aria-hidden
-                  />
-                )}
+                <div
+                  style={{
+                    width: 22,
+                    flexShrink: 0,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                  }}
+                >
+                  {isDone ? (
+                    <span style={{ color: '#111111', fontSize: 18 }} aria-hidden>✓</span>
+                  ) : (
+                    <div
+                      draggable
+                      onDragStart={(e) => {
+                        e.dataTransfer.setData('text/plain', hw.id)
+                        e.dataTransfer.effectAllowed = 'move'
+                      }}
+                      style={{ touchAction: 'none' }}
+                      aria-label="Drag to reorder"
+                    >
+                      <DragHandleDots />
+                    </div>
+                  )}
+                </div>
                 <div style={{ flex: 1, minWidth: 0, display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 8 }}>
                   {editingHw?.id === hw.id && editingHw.field === 'assignment' ? (
                     <input
@@ -617,6 +673,18 @@ export default function HomeworkPage() {
                       {hw.assignmentName}
                     </button>
                   )}
+                  <span
+                    aria-hidden
+                    style={{
+                      color: '#d4d4d4',
+                      fontSize: 18,
+                      fontWeight: 300,
+                      userSelect: 'none',
+                      lineHeight: 1,
+                    }}
+                  >
+                    |
+                  </span>
                   {editingHw?.id === hw.id && editingHw.field === 'course' ? (
                     <input
                       type="text"
@@ -633,12 +701,13 @@ export default function HomeworkPage() {
                       autoFocus
                       disabled={updatingId === hw.id}
                       style={{
-                        fontSize: 13,
-                        color: '#444444',
+                        fontSize: 12,
+                        color: '#888888',
                         padding: '4px 8px',
                         border: '2px solid #111111',
                         background: '#fff',
                         font: 'inherit',
+                        fontWeight: 400,
                         minWidth: 100,
                         flex: '1 1 120px',
                       }}
@@ -649,8 +718,9 @@ export default function HomeworkPage() {
                       onClick={() => startEditHw(hw, 'course')}
                       disabled={updatingId === hw.id}
                       style={{
-                        fontSize: 13,
-                        color: '#444444',
+                        fontSize: 12,
+                        color: '#888888',
+                        fontWeight: 400,
                         padding: 0,
                         border: 'none',
                         background: 'none',

@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
+import { DragHandleDots } from '@/components/DragHandleDots'
 import { Header } from '@/components/Header'
 import { useToast } from '@/components/ToastContext'
 import { parseLocalDate } from '@/lib/dateUtils'
@@ -25,6 +26,18 @@ function sortTopicsByDone(topics: Topic[]): Topic[] {
   const active = topics.filter((t) => t.difficulty !== 'easy')
   const done = topics.filter((t) => t.difficulty === 'easy')
   return [...active, ...done]
+}
+
+function reorderActiveTopics(topics: Topic[], dragId: string, dropId: string): Topic[] {
+  const active = topics.filter((t) => t.difficulty !== 'easy')
+  const done = topics.filter((t) => t.difficulty === 'easy')
+  const from = active.findIndex((t) => t.id === dragId)
+  const to = active.findIndex((t) => t.id === dropId)
+  if (from < 0 || to < 0 || dragId === dropId) return topics
+  const next = [...active]
+  const [removed] = next.splice(from, 1)
+  next.splice(to, 0, removed)
+  return sortTopicsByDone([...next, ...done])
 }
 
 const todayAtMidnight = () => {
@@ -184,6 +197,13 @@ export default function ExamPage({ params }: { params: { id: string } }) {
   function cancelEditingTopic() {
     setEditingTopicId(null)
     setEditingLabel('')
+  }
+
+  function reorderTopicRows(dragId: string, dropId: string) {
+    if (!exam) return
+    const merged = reorderActiveTopics(exam.topics ?? [], dragId, dropId)
+    setExam({ ...exam, topics: merged })
+    saveTopics(merged)
   }
 
   function openSettingsModal() {
@@ -762,6 +782,15 @@ export default function ExamPage({ params }: { params: { id: string } }) {
                 return (
                   <li
                     key={topic.id}
+                    onDragOver={(e) => {
+                      if (!isDone) e.preventDefault()
+                    }}
+                    onDrop={(e) => {
+                      e.preventDefault()
+                      if (isDone) return
+                      const dragId = e.dataTransfer.getData('text/plain')
+                      if (dragId) reorderTopicRows(dragId, topic.id)
+                    }}
                     style={{
                       display: 'flex',
                       alignItems: 'center',
@@ -772,9 +801,31 @@ export default function ExamPage({ params }: { params: { id: string } }) {
                       background: '#ffffff',
                     }}
                   >
-                    {isDone ? (
-                      <span style={{ color: '#111111', fontSize: 18 }} aria-hidden>✓</span>
-                    ) : null}
+                    <div
+                      style={{
+                        width: 22,
+                        flexShrink: 0,
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                      }}
+                    >
+                      {isDone ? (
+                        <span style={{ color: '#111111', fontSize: 18 }} aria-hidden>✓</span>
+                      ) : (
+                        <div
+                          draggable
+                          onDragStart={(e) => {
+                            e.dataTransfer.setData('text/plain', topic.id)
+                            e.dataTransfer.effectAllowed = 'move'
+                          }}
+                          style={{ touchAction: 'none' }}
+                          aria-label="Drag to reorder"
+                        >
+                          <DragHandleDots />
+                        </div>
+                      )}
+                    </div>
                     {editingTopicId === topic.id ? (
                       <input
                         type="text"
