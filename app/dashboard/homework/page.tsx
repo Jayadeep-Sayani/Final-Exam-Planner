@@ -9,6 +9,7 @@ import {
   useSensor,
   useSensors,
 } from '@dnd-kit/core'
+import { restrictToVerticalAxis } from '@dnd-kit/modifiers'
 import { SortableContext, arrayMove, verticalListSortingStrategy } from '@dnd-kit/sortable'
 import { HomeworkDoneRow } from '@/components/homework/HomeworkDoneRow'
 import { HomeworkSortableRow } from '@/components/homework/HomeworkSortableRow'
@@ -600,7 +601,12 @@ export default function HomeworkPage() {
           }
           return (
             <>
-              <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleHomeworkDragEnd}>
+              <DndContext
+                sensors={sensors}
+                collisionDetection={closestCenter}
+                onDragEnd={handleHomeworkDragEnd}
+                modifiers={[restrictToVerticalAxis]}
+              >
                 <SortableContext items={unfinished.map((h) => h.id)} strategy={verticalListSortingStrategy}>
                   <ul style={{ listStyle: 'none', margin: 0, padding: 0 }}>
                     {unfinished.map((hw) => {

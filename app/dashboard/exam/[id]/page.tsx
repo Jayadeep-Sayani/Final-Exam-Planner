@@ -11,6 +11,7 @@ import {
   useSensor,
   useSensors,
 } from '@dnd-kit/core'
+import { restrictToVerticalAxis } from '@dnd-kit/modifiers'
 import { SortableContext, arrayMove, verticalListSortingStrategy } from '@dnd-kit/sortable'
 import { TopicDoneRow } from '@/components/exam/TopicDoneRow'
 import { TopicSortableRow } from '@/components/exam/TopicSortableRow'
@@ -805,7 +806,12 @@ export default function ExamPage({ params }: { params: { id: string } }) {
               }
               return (
                 <>
-                  <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleTopicDragEnd}>
+                  <DndContext
+                    sensors={sensors}
+                    collisionDetection={closestCenter}
+                    onDragEnd={handleTopicDragEnd}
+                    modifiers={[restrictToVerticalAxis]}
+                  >
                     <SortableContext items={activeTopics.map((t) => t.id)} strategy={verticalListSortingStrategy}>
                       <ul style={{ listStyle: 'none', margin: 0, padding: 0 }}>
                         {activeTopics.map((topic) => (
