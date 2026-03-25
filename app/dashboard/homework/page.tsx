@@ -57,6 +57,8 @@ export default function HomeworkPage() {
   const [estimatedHours, setEstimatedHours] = useState('')
   const [submitting, setSubmitting] = useState(false)
   const [updatingId, setUpdatingId] = useState<string | null>(null)
+  const [editingHw, setEditingHw] = useState<{ id: string; field: 'assignment' | 'course' } | null>(null)
+  const [editHwText, setEditHwText] = useState('')
 
   useEffect(() => {
     let cancelled = false
@@ -157,6 +159,46 @@ export default function HomeworkPage() {
     const res = await fetch(`/api/homework/${id}`, { method: 'DELETE', credentials: 'include' })
     if (res.ok) {
       setHomeworks((prev) => prev.filter((h) => h.id !== id))
+    }
+  }
+
+  function startEditHw(hw: Homework, field: 'assignment' | 'course') {
+    setEditingHw({ id: hw.id, field })
+    setEditHwText(field === 'assignment' ? hw.assignmentName : hw.courseName)
+  }
+
+  function cancelEditHw() {
+    setEditingHw(null)
+    setEditHwText('')
+  }
+
+  async function saveHwField() {
+    if (!editingHw) return
+    const trimmed = editHwText.trim()
+    if (!trimmed) {
+      cancelEditHw()
+      return
+    }
+    const id = editingHw.id
+    const field = editingHw.field
+    setUpdatingId(id)
+    try {
+      const body =
+        field === 'assignment' ? { assignmentName: trimmed } : { courseName: trimmed }
+      const res = await fetch(`/api/homework/${id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify(body),
+      })
+      const data = await res.json()
+      if (res.ok && data.homework) {
+        setHomeworks((prev) => sortHomeworks(prev.map((h) => (h.id === id ? data.homework : h))))
+        showToast('Updated')
+      }
+    } finally {
+      setUpdatingId(null)
+      cancelEditHw()
     }
   }
 
@@ -525,19 +567,101 @@ export default function HomeworkPage() {
                     aria-hidden
                   />
                 )}
-                <div style={{ flex: 1, minWidth: 0 }}>
-                  <span
-                    style={{
-                      fontSize: 16,
-                      fontWeight: 600,
-                      color: '#111111',
-                      textDecoration: isDone ? 'line-through' : 'none',
-                      opacity: isDone ? 0.7 : 1,
-                    }}
-                  >
-                    {hw.assignmentName}
-                  </span>
-                  <span style={{ fontSize: 13, color: '#444444', marginLeft: 8 }}>{hw.courseName}</span>
+                <div style={{ flex: 1, minWidth: 0, display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 8 }}>
+                  {editingHw?.id === hw.id && editingHw.field === 'assignment' ? (
+                    <input
+                      type="text"
+                      value={editHwText}
+                      onChange={(e) => setEditHwText(e.target.value)}
+                      onBlur={saveHwField}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter') {
+                          e.preventDefault()
+                          saveHwField()
+                        }
+                        if (e.key === 'Escape') cancelEditHw()
+                      }}
+                      autoFocus
+                      disabled={updatingId === hw.id}
+                      style={{
+                        fontSize: 16,
+                        fontWeight: 600,
+                        color: '#111111',
+                        padding: '4px 8px',
+                        border: '2px solid #111111',
+                        background: '#fff',
+                        font: 'inherit',
+                        minWidth: 120,
+                        flex: '1 1 140px',
+                      }}
+                    />
+                  ) : (
+                    <button
+                      type="button"
+                      onClick={() => startEditHw(hw, 'assignment')}
+                      disabled={updatingId === hw.id}
+                      style={{
+                        fontSize: 16,
+                        fontWeight: 600,
+                        color: '#111111',
+                        textDecoration: isDone ? 'line-through' : 'none',
+                        opacity: isDone ? 0.7 : 1,
+                        padding: 0,
+                        border: 'none',
+                        background: 'none',
+                        font: 'inherit',
+                        cursor: 'text',
+                        textAlign: 'left',
+                      }}
+                    >
+                      {hw.assignmentName}
+                    </button>
+                  )}
+                  {editingHw?.id === hw.id && editingHw.field === 'course' ? (
+                    <input
+                      type="text"
+                      value={editHwText}
+                      onChange={(e) => setEditHwText(e.target.value)}
+                      onBlur={saveHwField}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter') {
+                          e.preventDefault()
+                          saveHwField()
+                        }
+                        if (e.key === 'Escape') cancelEditHw()
+                      }}
+                      autoFocus
+                      disabled={updatingId === hw.id}
+                      style={{
+                        fontSize: 13,
+                        color: '#444444',
+                        padding: '4px 8px',
+                        border: '2px solid #111111',
+                        background: '#fff',
+                        font: 'inherit',
+                        minWidth: 100,
+                        flex: '1 1 120px',
+                      }}
+                    />
+                  ) : (
+                    <button
+                      type="button"
+                      onClick={() => startEditHw(hw, 'course')}
+                      disabled={updatingId === hw.id}
+                      style={{
+                        fontSize: 13,
+                        color: '#444444',
+                        padding: 0,
+                        border: 'none',
+                        background: 'none',
+                        font: 'inherit',
+                        cursor: 'text',
+                        textAlign: 'left',
+                      }}
+                    >
+                      {hw.courseName}
+                    </button>
+                  )}
                   <span style={{ fontSize: 13, marginLeft: 8, color: isDone ? '#666666' : urgency, fontWeight: 600 }}>
                     {daysLabel}
                   </span>

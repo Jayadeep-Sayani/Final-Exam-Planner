@@ -21,6 +21,12 @@ function generateId() {
   return Date.now().toString(36) + Math.random().toString(36).slice(2)
 }
 
+function sortTopicsByDone(topics: Topic[]): Topic[] {
+  const active = topics.filter((t) => t.difficulty !== 'easy')
+  const done = topics.filter((t) => t.difficulty === 'easy')
+  return [...active, ...done]
+}
+
 const todayAtMidnight = () => {
   const d = new Date()
   d.setHours(0, 0, 0, 0)
@@ -134,7 +140,7 @@ export default function ExamPage({ params }: { params: { id: string } }) {
     const label = newTopicLabel.trim()
     if (!label || !exam) return
     const topic: Topic = { id: generateId(), label, difficulty: 'hard' }
-    const topics = [...(exam.topics ?? []), topic]
+    const topics = sortTopicsByDone([...(exam.topics ?? []), topic])
     setExam({ ...exam, topics })
     setNewTopicLabel('')
     saveTopics(topics)
@@ -142,8 +148,8 @@ export default function ExamPage({ params }: { params: { id: string } }) {
 
   function setTopicDifficulty(topicId: string, difficulty: 'hard' | 'medium' | 'easy') {
     if (!exam) return
-    const topics = (exam.topics ?? []).map((t) =>
-      t.id === topicId ? { ...t, difficulty } : t
+    const topics = sortTopicsByDone(
+      (exam.topics ?? []).map((t) => (t.id === topicId ? { ...t, difficulty } : t))
     )
     setExam({ ...exam, topics })
     saveTopics(topics)
@@ -151,7 +157,7 @@ export default function ExamPage({ params }: { params: { id: string } }) {
 
   function removeTopic(topicId: string) {
     if (!exam) return
-    const topics = (exam.topics ?? []).filter((t) => t.id !== topicId)
+    const topics = sortTopicsByDone((exam.topics ?? []).filter((t) => t.id !== topicId))
     setExam({ ...exam, topics })
     saveTopics(topics)
   }
@@ -165,8 +171,8 @@ export default function ExamPage({ params }: { params: { id: string } }) {
     if (!exam || !editingTopicId) return
     const trimmed = editingLabel.trim()
     if (trimmed) {
-      const topics = (exam.topics ?? []).map((t) =>
-        t.id === editingTopicId ? { ...t, label: trimmed } : t
+      const topics = sortTopicsByDone(
+        (exam.topics ?? []).map((t) => (t.id === editingTopicId ? { ...t, label: trimmed } : t))
       )
       setExam({ ...exam, topics })
       saveTopics(topics)
@@ -241,7 +247,7 @@ export default function ExamPage({ params }: { params: { id: string } }) {
     }
   }
 
-  const topics = exam?.topics ?? []
+  const topics = sortTopicsByDone(exam?.topics ?? [])
 
   return (
     <>
